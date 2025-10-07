@@ -21,6 +21,7 @@ classifiers = [
 ]
 dependencies = [
   "markitdown",
+  "argcomplete",
 ]
 
 [tool.hatch.version]

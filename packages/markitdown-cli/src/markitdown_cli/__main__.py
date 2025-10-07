@@ -4,6 +4,7 @@
 
 # Avoid top-level imports in this file for faster start-up times when using
 # `--help`.
+# PYTHON_ARGCOMPLETE_OK
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -19,6 +20,7 @@ def parse_args():
     import argparse
     from .__about__ import __version__
     from textwrap import dedent
+    import argcomplete
 
     parser = argparse.ArgumentParser(
         description="Convert various file formats to markdown.",
@@ -120,6 +122,9 @@ def parse_args():
     )
 
     parser.add_argument("filename", nargs="?")
+
+    argcomplete.autocomplete(parser)
+
     args = parser.parse_args()
 
     return args
