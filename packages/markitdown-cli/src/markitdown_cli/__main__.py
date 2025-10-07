@@ -1,16 +1,25 @@
 # SPDX-FileCopyrightText: 2024-present Adam Fourney <adamfo@microsoft.com>
 #
 # SPDX-License-Identifier: MIT
-import argparse
-import sys
-import codecs
-from textwrap import dedent
-from importlib.metadata import entry_points
-from .__about__ import __version__
-from ._markitdown import MarkItDown, StreamInfo, DocumentConverterResult
+
+# Avoid top-level imports in this file for faster start-up times when using
+# `--help`.
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from markitdown._markitdown import DocumentConverterResult
 
 
 def main():
+    args = parse_args()
+    run(args)
+
+
+def parse_args():
+    import argparse
+    from .__about__ import __version__
+    from textwrap import dedent
+
     parser = argparse.ArgumentParser(
         description="Convert various file formats to markdown.",
         prog="markitdown",
@@ -113,6 +122,15 @@ def main():
     parser.add_argument("filename", nargs="?")
     args = parser.parse_args()
 
+    return args
+
+
+def run(args):
+    import sys
+    import codecs
+    from importlib.metadata import entry_points
+    from markitdown._markitdown import MarkItDown, StreamInfo
+
     # Parse the extension hint
     extension_hint = args.extension
     if extension_hint is not None:
@@ -200,8 +218,10 @@ def main():
     _handle_output(args, result)
 
 
-def _handle_output(args, result: DocumentConverterResult):
+def _handle_output(args, result: "DocumentConverterResult"):
     """Handle output to stdout or file"""
+    import sys
+
     if args.output:
         with open(args.output, "w", encoding="utf-8") as f:
             f.write(result.markdown)
@@ -215,6 +235,8 @@ def _handle_output(args, result: DocumentConverterResult):
 
 
 def _exit_with_error(message: str):
+    import sys
+
     print(message)
     sys.exit(1)
 
